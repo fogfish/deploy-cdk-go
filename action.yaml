@@ -109,7 +109,7 @@ runs:
     - name: cdk deploy
       shell: bash
       run: |
-        cdk ${{ inputs.command }} ${{ inputs.stack }}-${{ inputs.version }} \
+        cdk ${{ inputs.command }} -f ${{ inputs.stack }}-${{ inputs.version }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
