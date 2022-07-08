@@ -1,0 +1,21 @@
+name: spawner-cdk-go
+
+description: 'xxx'
+
+author: "xxx"
+
+branding:
+  icon: "alert-triangle"
+  color: "blue"
+
+inputs:
+  stacks:
+    description: |
+      xxx
+    required: true
+
+runs:
+  steps:
+    - name: go get tools
+      run: |
+        echo "==> ${{ inputs.stacks }}"
