@@ -15,6 +15,11 @@ inputs:
     required: true
     default: 1.18
 
+  cache-key:
+    description: |
+      xxx
+    required: false
+
   stack:
     description: |
       xxx
@@ -67,6 +72,14 @@ runs:
       with:
         go-version: ${{ inputs.go-version }}
         cache: true
+
+    - uses: actions/cache@v3
+      if: ${{ inputs.cache-key != '' }}
+      with:
+        path: ./cdk.out
+        key: ${{ inputs.cache-key }}-${{ inputs.stack }}-${{ runner.os }}-cdk-${{ hashFiles('**/manifest.json') }}
+        restore-keys: |
+          ${{ inputs.cache-key }}-${{ inputs.stack }}-${{ runner.os }}-cdk-
 
     - name: setup-cdk
       shell: bash
