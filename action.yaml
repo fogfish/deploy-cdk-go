@@ -17,7 +17,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: go get tools
-      shell: bash
+    - shell: bash
       run: |
         echo "==> ${{ inputs.stack }}"
