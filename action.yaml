@@ -20,6 +20,12 @@ inputs:
       xxx
     required: false
 
+  command:
+    description: |
+      xxx
+    required: true
+    default: 'deploy'
+
   stack:
     description: |
       xxx
@@ -29,6 +35,7 @@ inputs:
     description: |
       xxx
     required: true
+    default: 'latest'
 
   aws-access-key:
     description: |
@@ -64,7 +71,7 @@ runs:
       id: issue
       if: ${{ inputs.issue-to-create != '' }} 
       with:
-        title: Spawns `${{ inputs.version }}` of `${{ inputs.stack }}` to the cloud 
+        title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}` to the cloud 
         content-filepath: ${{ inputs.issue-to-create }}
 
     - uses: peter-evans/create-or-update-comment@v2
@@ -72,14 +79,14 @@ runs:
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         body: |
-          TODO environment of #${{ inputs.issue-to-comment }}
+          ${{ inputs.command }} environment of #${{ inputs.issue-to-comment }}
 
     - uses: peter-evans/create-or-update-comment@v2
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          TODO in context of #${{ steps.issue.outputs.issue-number }}
+          ${{ inputs.command }} in context of #${{ steps.issue.outputs.issue-number }}
 
     - uses: actions/setup-go@v3
       with:
@@ -109,7 +116,7 @@ runs:
     - name: cdk deploy
       shell: bash
       run: |
-        cdk deploy ${{ inputs.stack }}-${{ inputs.version }} \
+        cdk ${{ inputs.command }} ${{ inputs.stack }}-${{ inputs.version }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -129,7 +136,7 @@ runs:
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          Sandbox for **${{ inputs.stack }}** is deployed to cloud environment:
+          Version `${{ inputs.version }}` **${{ inputs.stack }}** is ${{ inputs.command }} to cloud environment:
           - **url**: ${{ steps.discover.outputs.target }}
         reactions: rocket
 
@@ -138,6 +145,6 @@ runs:
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
-          Version `${{ inputs.version }}` of **${{ inputs.stack }}** is deployed to cloud environment:
+          Version `${{ inputs.version }}` of **${{ inputs.stack }}** is ${{ inputs.command }} to cloud environment:
           - **url**: ${{ steps.discover.outputs.target }}
 
