@@ -9,7 +9,7 @@ branding:
   color: "blue"
 
 inputs:
-  stacks:
+  stack:
     description: |
       xxx
     required: true
@@ -18,4 +18,4 @@ runs:
   steps:
     - name: go get tools
       run: |
-        echo "==> ${{ inputs.stacks }}"
+        echo "==> ${{ inputs.stack }}"
