@@ -17,5 +17,6 @@ inputs:
 runs:
   steps:
     - name: go get tools
+      shell: bash
       run: |
         echo "==> ${{ inputs.stack }}"
