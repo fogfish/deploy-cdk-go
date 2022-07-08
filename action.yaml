@@ -58,7 +58,7 @@ runs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ inputs.aws-access-key }}
-        aws-secret-access-key: ${{ inputs.access-secret-key }}
+        aws-secret-access-key: ${{ inputs.aws-secret-key }}
         aws-region: ${{ inputs.aws-region }}
 
     - name: cdk deploy
