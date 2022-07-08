@@ -41,6 +41,11 @@ inputs:
     required: false
     default: eu-west-1
 
+  issue-to-comment:
+    description: |
+      xxx
+    required: false
+
 runs:
   using: "composite"
   steps:
@@ -64,7 +69,7 @@ runs:
     - name: cdk deploy
       shell: bash
       run: |
-        cdk deploy ${{ matrix.stack }}-${{ inputs.version }} \
+        cdk deploy ${{ inputs.stack }}-${{ inputs.version }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -77,12 +82,13 @@ runs:
     - id: discover
       shell: bash
       run: |
-        echo ::set-output name=target::$(jq -r '.["${{ matrix.stack }}-${{ inputs.version }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json)
+        echo ::set-output name=target::$(jq -r '.["${{ inputs.stack }}-${{ inputs.version }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json)
 
     - uses: peter-evans/create-or-update-comment@v2
+      if: ${{ inputs.issue-to-comment != '' }} 
       with:
-        issue-number: ${{ github.event.number }}
+        issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          Sandbox for **${{ matrix.stack }}** is deployed to cloud environment:
+          Sandbox for **${{ inputs.stack }}** is deployed to cloud environment:
           - **url**: ${{ steps.discover.outputs.target }}
         reactions: rocket
