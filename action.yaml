@@ -71,7 +71,7 @@ runs:
       id: issue
       if: ${{ inputs.issue-to-create != '' }} 
       with:
-        title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}` to the cloud 
+        title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
         content-filepath: ${{ inputs.issue-to-create }}
 
     - uses: peter-evans/create-or-update-comment@v2
@@ -136,7 +136,7 @@ runs:
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          Version `${{ inputs.version }}` **${{ inputs.stack }}** is ${{ inputs.command }} to cloud environment:
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed:
           - **url**: ${{ steps.discover.outputs.target }}
         reactions: rocket
 
@@ -145,6 +145,6 @@ runs:
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
-          Version `${{ inputs.version }}` of **${{ inputs.stack }}** is ${{ inputs.command }} to cloud environment:
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed:
           - **url**: ${{ steps.discover.outputs.target }}
 
