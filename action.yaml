@@ -43,8 +43,7 @@ inputs:
   aws-region:
     description: |
       xxx
-    required: false
-    default: eu-west-1
+    required: true
 
   issue-to-comment:
     description: |
