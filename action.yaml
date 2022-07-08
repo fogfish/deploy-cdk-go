@@ -72,14 +72,14 @@ runs:
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         body: |
-          TODO #${{ inputs.issue-to-comment }}
+          TODO environment of #${{ inputs.issue-to-comment }}
 
     - uses: peter-evans/create-or-update-comment@v2
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          TODO #${{ steps.issue.outputs.issue-number }}
+          TODO in context of #${{ steps.issue.outputs.issue-number }}
 
     - uses: actions/setup-go@v3
       with:
