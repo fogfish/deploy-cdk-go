@@ -6,8 +6,7 @@ GitHub Actions simplifies deployment of Golang AWS CDK application to AWS accoun
 
 See [Serverless Blueprint for Golang](https://github.com/fogfish/blueprint-serverless-golang) for complete set of examples 
 
-
-Deploy GitHub Releases
+### Deploy GitHub Releases
 
 ```yaml
 name: carry
@@ -36,6 +35,5 @@ jobs:
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
-
 ```
 
