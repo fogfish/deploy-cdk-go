@@ -1,72 +1,67 @@
-name: spawner-cdk-go
+name: deploy-cdk-go
+author: fogfish
 
-description: 'xxx'
-
-author: "xxx"
-
-branding:
-  icon: "alert-triangle"
-  color: "blue"
+description: |
+  deploys AWS CDK Golang applications to AWS   
 
 inputs:
   go-version:
     description: |
-      xxx
+      The version of Golang to use. 
     required: true
     default: 1.18
 
-  cache-key:
-    description: |
-      xxx
-    required: false
-
   command:
     description: |
-      xxx
+      AWS CDK command to run inside the workflow.
+      The action allows to `deploy` or `destroy` application.
+      Use the command to automate clean-up of cloud environments.
     required: true
     default: 'deploy'
 
   stack:
     description: |
-      xxx
+      Name of AWS CDK stack from the application.
     required: true
 
   version:
     description: |
-      xxx
+      Version label of the stack.
     required: true
     default: 'latest'
 
   aws-access-key:
     description: |
-      xxx
+      AWS Access Key. Use GitHub Secret Vault feature.
     required: true
 
   aws-secret-key:
     description: |
-      xxx
+      AWS Secret Access Key. Use GitHub Secret Vault feature.
     required: true
 
   aws-region:
     description: |
-      xxx
+      AWS Region.
     required: true
 
   issue-to-comment:
     description: |
-      xxx
+      Number of GitHub issue to report the progress of deployment.
     required: false
     default: ''
 
   issue-to-create:
     description: |
-      xxx
+      Path to issue template to be opened while deployment is going on.  
     required: false
     default: ''
   
 runs:
   using: "composite"
   steps:
+    ##
+    ## Opens the "deployment" issue
     - uses: peter-evans/create-issue-from-file@v4
       id: issue
       if: ${{ inputs.issue-to-create != '' }} 
@@ -74,6 +69,8 @@ runs:
         title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
         content-filepath: ${{ inputs.issue-to-create }}
 
+    ##
+    ## Comment progress of deployment
     - uses: peter-evans/create-or-update-comment@v2
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
@@ -88,18 +85,12 @@ runs:
         body: |
           ${{ inputs.command }} in context of #${{ steps.issue.outputs.issue-number }}
 
+    ##
+    ## Setup environment
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ inputs.go-version }}
         cache: true
-
-    - uses: actions/cache@v3
-      if: ${{ inputs.cache-key != '' }}
-      with:
-        path: ./cdk.out
-        key: ${{ inputs.cache-key }}-${{ inputs.stack }}-${{ runner.os }}-cdk-${{ hashFiles('**/manifest.json') }}
-        restore-keys: |
-          ${{ inputs.cache-key }}-${{ inputs.stack }}-${{ runner.os }}-cdk-
 
     - name: setup-cdk
       shell: bash
@@ -113,6 +104,8 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-key }}
         aws-region: ${{ inputs.aws-region }}
 
+    ##
+    ## Deploy
     - name: cdk deploy
       shell: bash
       run: |
@@ -125,14 +118,16 @@ runs:
         GOMODCACHE: /home/runner/go/pkg/mod
 
     ##
-    ## discover url of deployed api and runs api testing   
+    ## Discover url of deployed api and runs api testing   
     - id: discover
       shell: bash
       run: |
         echo ::set-output name=target::$(jq -r '.["${{ inputs.stack }}-${{ inputs.version }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json)
 
+    ##
+    ## Comment progress of deployment
     - uses: peter-evans/create-or-update-comment@v2
-      if: ${{ inputs.issue-to-comment != '' }} 
+      if: ${{ (inputs.issue-to-comment != '') && (steps.discover.outputs.target != '') }} 
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
@@ -140,11 +135,28 @@ runs:
           - **url**: ${{ steps.discover.outputs.target }}
         reactions: rocket
 
+    - uses: peter-evans/create-or-update-comment@v2
+      if: ${{ (inputs.issue-to-comment != '') && (steps.discover.outputs.target == '') }} 
+      with:
+        issue-number: ${{ inputs.issue-to-comment }}
+        body: |
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed.
+        reactions: rocket
+
+    ##
+    ## Close the "deployment" issue
     - uses: peter-evans/close-issue@v2
-      if: ${{ inputs.issue-to-create != '' }} 
+      if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target != '') }} 
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
           ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed:
           - **url**: ${{ steps.discover.outputs.target }}
+
+    - uses: peter-evans/close-issue@v2
+      if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target == '') }} 
+      with:
+        issue-number: ${{ steps.issue.outputs.issue-number }}
+        comment: |
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed.
 
