@@ -107,9 +107,22 @@ runs:
     ##
     ## Deploy
     - name: cdk deploy
+      if: ${{ inputs.command  == 'deploy' }}
       shell: bash
       run: |
-        cdk ${{ inputs.command }} -f ${{ inputs.stack }}-${{ inputs.version }} \
+        cdk ${{ inputs.command }} -e ${{ inputs.stack }}-${{ inputs.version }} \
+          -c vsn=${{ inputs.version }} \
+          --outputs-file $GITHUB_WORKSPACE/stack.json
+      env:
+        GOPATH: /home/runner/go
+        GOCACHE: /home/runner/.cache/go-build
+        GOMODCACHE: /home/runner/go/pkg/mod
+
+    - name: cdk destroy
+      if: ${{ inputs.command  == 'destroy' }}
+      shell: bash
+      run: |
+        cdk ${{ inputs.command }} -e -f ${{ inputs.stack }}-${{ inputs.version }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
