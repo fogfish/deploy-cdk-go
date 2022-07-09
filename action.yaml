@@ -76,14 +76,16 @@ runs:
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         body: |
-          ${{ inputs.command }} environment of #${{ inputs.issue-to-comment }}
+          see #${{ inputs.issue-to-comment }}
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}**
 
     - uses: peter-evans/create-or-update-comment@v2
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
-          ${{ inputs.command }} in context of #${{ steps.issue.outputs.issue-number }}
+          see #${{ steps.issue.outputs.issue-number }}
+          ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}**
 
     ##
     ## Setup environment
