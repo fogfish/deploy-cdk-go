@@ -51,9 +51,21 @@ inputs:
     required: false
     default: ''
 
+  skip-status-comment:
+    description: |
+      Skip comments about the deployment status, output only deployed endpoints.
+    required: false
+    default: false
+
   issue-to-create:
     description: |
       Path to issue template to be opened while deployment is going on.  
+    required: false
+    default: ''
+
+  issue-on-error:
+    description: |
+      Create issue if action fails
     required: false
     default: ''
 
@@ -157,7 +169,7 @@ runs:
         reactions: rocket
 
     - uses: peter-evans/create-or-update-comment@v2
-      if: ${{ (inputs.issue-to-comment != '') && (steps.discover.outputs.target == '') }} 
+      if: ${{ (inputs.skip-status-comment != 'true') && (inputs.issue-to-comment != '') && (steps.discover.outputs.target == '') }} 
       with:
         issue-number: ${{ inputs.issue-to-comment }}
         body: |
@@ -180,4 +192,12 @@ runs:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
           ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed.
+
+    ##
+    ##
+    - uses: peter-evans/create-issue-from-file@v4
+      if: ${{ failure() && inputs.issue-on-error != '' }} 
+      with:
+        title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
+        content-filepath: ${{ inputs.issue-on-error }}
 
