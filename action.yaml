@@ -56,11 +56,6 @@ inputs:
       Path to issue template to be opened while deployment is going on.  
     required: false
     default: ''
-  
-  issue-keep-open:
-    description: |
-      Keep created issue open
-    default: false
 
 outputs:
   issue-number:
@@ -172,7 +167,7 @@ runs:
     ##
     ## Close the "deployment" issue
     - uses: peter-evans/close-issue@v2
-      if: ${{ (inputs.issue-keep-open == 'false') && (inputs.issue-to-create != '') && (steps.discover.outputs.target != '') }} 
+      if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target != '') }} 
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
@@ -180,7 +175,7 @@ runs:
           - **url**: ${{ steps.discover.outputs.target }}
 
     - uses: peter-evans/close-issue@v2
-      if: ${{ (inputs.issue-keep-open == 'false') && (inputs.issue-to-create != '') && (steps.discover.outputs.target == '') }} 
+      if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target == '') }} 
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
         comment: |
