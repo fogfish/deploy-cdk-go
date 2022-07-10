@@ -198,6 +198,6 @@ runs:
     - uses: peter-evans/create-issue-from-file@v4
       if: ${{ failure() && inputs.issue-on-error != '' }} 
       with:
-        title: ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
+        title: Failed to ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
         content-filepath: ${{ inputs.issue-on-error }}
 
