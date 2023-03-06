@@ -75,6 +75,12 @@ outputs:
       Output issue number created by the action
     value: ${{ steps.issue.outputs.issue-number }}
 
+  deployed-api:
+    description: |
+      Reference to deployed api
+    value: ${{ steps.discover.outputs.target }}
+      
+
 runs:
   using: "composite"
   steps:
