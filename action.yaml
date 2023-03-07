@@ -161,7 +161,7 @@ runs:
     - id: discover
       shell: bash
       run: |
-        echo name=target::$(jq -r '.["${{ inputs.stack }}-${{ inputs.version }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
+        echo target=$(jq -r '.["${{ inputs.stack }}-${{ inputs.version }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
 
     ##
     ## Comment progress of deployment
