@@ -86,7 +86,7 @@ runs:
   steps:
     ##
     ## Opens the "deployment" issue
-    - uses: peter-evans/create-issue-from-file@v4
+    - uses: peter-evans/create-issue-from-file@v4.0.1
       id: issue
       if: ${{ inputs.issue-to-create != '' }} 
       with:
@@ -95,7 +95,7 @@ runs:
 
     ##
     ## Comment progress of deployment
-    - uses: peter-evans/create-or-update-comment@v2
+    - uses: peter-evans/create-or-update-comment@v3.1.0
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
@@ -103,7 +103,7 @@ runs:
           see #${{ inputs.issue-to-comment }}
           ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}**
 
-    - uses: peter-evans/create-or-update-comment@v2
+    - uses: peter-evans/create-or-update-comment@v3.1.0
       if: ${{ (inputs.issue-to-create != '') && (inputs.issue-to-comment != '') }}
       with:
         issue-number: ${{ inputs.issue-to-comment }}
@@ -113,7 +113,7 @@ runs:
 
     ##
     ## Setup environment
-    - uses: actions/setup-go@v3
+    - uses: actions/setup-go@v4
       with:
         go-version: ${{ inputs.go-version }}
         cache: true
@@ -124,7 +124,7 @@ runs:
         npm install -g aws-cdk
 
     - name: aws access
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.aws-access-key }}
         aws-secret-access-key: ${{ inputs.aws-secret-key }}
@@ -165,7 +165,7 @@ runs:
 
     ##
     ## Comment progress of deployment
-    - uses: peter-evans/create-or-update-comment@v2
+    - uses: peter-evans/create-or-update-comment@v3.1.0
       if: ${{ (inputs.issue-to-comment != '') && (steps.discover.outputs.target != '') }} 
       with:
         issue-number: ${{ inputs.issue-to-comment }}
@@ -174,7 +174,7 @@ runs:
           - **url**: ${{ steps.discover.outputs.target }}
         reactions: rocket
 
-    - uses: peter-evans/create-or-update-comment@v2
+    - uses: peter-evans/create-or-update-comment@v3.1.0
       if: ${{ (inputs.skip-status-comment != 'true') && (inputs.issue-to-comment != '') && (steps.discover.outputs.target == '') }} 
       with:
         issue-number: ${{ inputs.issue-to-comment }}
@@ -184,7 +184,7 @@ runs:
 
     ##
     ## Close the "deployment" issue
-    - uses: peter-evans/close-issue@v2
+    - uses: peter-evans/close-issue@v3.0.1
       if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target != '') }} 
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
@@ -192,7 +192,7 @@ runs:
           ${{ inputs.command }} `${{ inputs.version }}` of **${{ inputs.stack }}** is completed:
           - **url**: ${{ steps.discover.outputs.target }}
 
-    - uses: peter-evans/close-issue@v2
+    - uses: peter-evans/close-issue@v3.0.1
       if: ${{ (inputs.issue-to-create != '') && (steps.discover.outputs.target == '') }} 
       with:
         issue-number: ${{ steps.issue.outputs.issue-number }}
@@ -201,7 +201,7 @@ runs:
 
     ##
     ##
-    - uses: peter-evans/create-issue-from-file@v4
+    - uses: peter-evans/create-issue-from-file@v4.0.1
       if: ${{ failure() && inputs.issue-on-error != '' }} 
       with:
         title: Failed to ${{ inputs.command }} `${{ inputs.version }}` of `${{ inputs.stack }}`
