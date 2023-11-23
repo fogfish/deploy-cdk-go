@@ -136,7 +136,7 @@ runs:
       if: ${{ inputs.command  == 'deploy' }}
       shell: bash
       run: |
-        cdk ${{ inputs.command }} -e ${${{ inputs.stack }}/.version/${{ inputs.version }}} \
+        cdk ${{ inputs.command }} -e '${'${{ inputs.stack }}/%.version/${{ inputs.version }}'}' \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -148,7 +148,7 @@ runs:
       if: ${{ inputs.command  == 'destroy' }}
       shell: bash
       run: |
-        cdk ${{ inputs.command }} -e -f ${${{ inputs.stack }}/.version/${{ inputs.version }}} \
+        cdk ${{ inputs.command }} -e -f '${'${{ inputs.stack }}/%.version/${{ inputs.version }}'}' \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -161,7 +161,7 @@ runs:
     - id: discover
       shell: bash
       run: |
-        echo target=$(jq -r '.["${${{ inputs.stack }}/.version/${{ inputs.version }}}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
+        echo target=$(jq -r '.["'${'${{ inputs.stack }}/%.version/${{ inputs.version }}'}'"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
 
     ##
     ## Comment progress of deployment
