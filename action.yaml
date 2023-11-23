@@ -134,7 +134,7 @@ runs:
       id: identity
       shell: bash
       run: |
-        echo "stack=${SID/%.version/$VSN} >> $GITHUB_OUTPUT
+        echo "stack=${SID/%.version/$VSN}" >> $GITHUB_OUTPUT
       env:
         SID: ${{ inputs.stack }}
         VSN: ${{ inputs.version }}
