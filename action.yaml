@@ -130,22 +130,13 @@ runs:
         aws-secret-access-key: ${{ inputs.aws-secret-key }}
         aws-region: ${{ inputs.aws-region }}
 
-    - name: define stack name
-      id: identity
-      shell: bash
-      run: |
-        echo "stack=${SID/%.version/-$VSN}" >> $GITHUB_OUTPUT
-      env:
-        SID: ${{ inputs.stack }}
-        VSN: ${{ inputs.version }}
-
     ##
     ## Deploy
     - name: cdk deploy
       if: ${{ inputs.command  == 'deploy' }}
       shell: bash
       run: |
-        cdk ${{ inputs.command }} -e ${{ steps.identity.outputs.stack }} \
+        cdk ${{ inputs.command }} -e ${{ inputs.stack }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -157,7 +148,7 @@ runs:
       if: ${{ inputs.command  == 'destroy' }}
       shell: bash
       run: |
-        cdk ${{ inputs.command }} -e -f ${{ steps.identity.outputs.stack }} \
+        cdk ${{ inputs.command }} -e -f ${{ inputs.stack }} \
           -c vsn=${{ inputs.version }} \
           --outputs-file $GITHUB_WORKSPACE/stack.json
       env:
@@ -170,7 +161,7 @@ runs:
     - id: discover
       shell: bash
       run: |
-        echo target=$(jq -r '.["${{ steps.identity.outputs.stack }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
+        echo target=$(jq -r '.["${{ inputs.stack }}"] | to_entries | .[] | select(.key|test("GatewayEndpoint.*")) | .value ' < $GITHUB_WORKSPACE/stack.json) >> $GITHUB_OUTPUT
 
     ##
     ## Comment progress of deployment
